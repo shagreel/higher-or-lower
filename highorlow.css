@@ -1,0 +1,66 @@
+#board {
+    width: 1040px;
+}
+
+#field {
+    width: 1000px;
+    height: 500px;
+    padding: 50px;
+    margin: 20px;
+    border: 1px solid black;
+    border-radius: 10px;
+    background: darkgreen;
+}
+
+.card img {
+    width: 160px;
+    padding: 10px;
+}
+
+.arrow {
+    margin-left: -180px;
+    opacity: 50%;
+}
+
+#buttons {
+    width: 100%;
+    text-align: center;
+}
+
+#buttons button {
+    font-size: xx-large;
+    padding: 15px;
+    margin: 10px 50px;
+}
+
+#score {
+    font-size: xx-large;
+    width: 1040px;
+    text-align: center;
+    vertical-align: center;
+    position: absolute;
+}
+
+#win {
+    color: darkgreen;
+    position: absolute;
+}
+
+#lose {
+    color: darkred;
+    position: absolute;
+}
+
+#sorry {
+    font-size: 20em;
+    position: absolute;
+    color: darkred;
+    padding: 50px;
+    z-index: 999999;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+#sorry span {
+    filter: drop-shadow(0 0 .5rem black);
+}

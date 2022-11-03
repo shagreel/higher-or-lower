@@ -1,0 +1,217 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="highorlow.css">
+        <script src='elements.cardmeister.min.js'></script>
+        <script src="sparkle.min.js"></script>
+        <script>
+            var orderedDeck = ["As","2s","3s","4s","5s","6s","7s","8s","9s","Ts"];
+            var field, deck, previousCard;
+            if (!localStorage.getItem("win")) {
+                localStorage.setItem("win", 0);
+            }
+            if (!localStorage.getItem("lose")) {
+                localStorage.setItem("lose", 0);
+            }
+            if ((new URLSearchParams(window.location.search)).has("clear")) {
+                localStorage.setItem("lose", 0);
+                localStorage.setItem("win", 0);
+                window.location.search = "";
+            }
+
+            function startGame() {
+                document.getElementById("win").textContent = localStorage.getItem("win");
+                document.getElementById("lose").textContent = localStorage.getItem("lose");
+                field = document.getElementById("field");
+                while(field.firstChild) {
+                    field.removeChild(field.firstChild);
+                }
+                deck = shuffle(Array.from(orderedDeck));
+                previousCard = pickACard();
+                showCard(previousCard);
+            }
+
+            function higher() {
+                showArrow(true);
+                var card = pickACard();
+                showCard(card);
+                if (!isHigher(card)) {
+                    previousCard = card;
+                    showWrong();
+                } else {
+                    previousCard = card;
+                    checkForWin();
+                }
+            }
+
+            function lower() {
+                showArrow(false);
+                var card = pickACard();
+                showCard(card);
+                if (isHigher(card)) {
+                    previousCard = card;
+                    showWrong();
+                } else {
+                    previousCard = card;
+                    checkForWin()
+                }
+            }
+
+            function showCard(card) {
+                field.insertAdjacentHTML('beforeend', '<card-t cid="' + card + '" id="' + card + '" class="card"></card-t>');
+            }
+
+            function isHigher(currentCard) {
+                var pi = cardValue(previousCard);
+                var ci = cardValue(currentCard);
+                return (ci > pi);
+            }
+
+            function cardValue(card) {
+                return orderedDeck.indexOf(card);
+            }
+
+            function shuffle(array) {
+                let currentIndex = array.length,  randomIndex;
+
+                // While there remain elements to shuffle.
+                while (currentIndex != 0) {
+
+                    // Pick a remaining element.
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex--;
+
+                    // And swap it with the current element.
+                    [array[currentIndex], array[randomIndex]] = [
+                        array[randomIndex], array[currentIndex]];
+                }
+
+                return array;
+            }
+
+            function pickACard() {
+                if (deck.length == 0){
+                    youWin();
+                } else {
+                    return deck.pop();
+                }
+            }
+
+            function checkForWin() {
+                if (deck.length == 0) {
+                    youWin();
+                }
+            }
+
+            async function youWin() {
+                document.getElementById("board").sparkle({
+                    count: 30,
+                    minAge: 300,
+                    maxAge: 800
+                });
+                localStorage.setItem("win", parseInt(localStorage.getItem("win"))+1);
+                document.getElementById("win").textContent = localStorage.getItem("win");
+                document.getElementById("win").animate([
+                    { transform: 'translateY(-0.0em)' , fontSize: '1em' },
+                    { transform: 'translateY(-0.5em)' , fontSize: '2em' },
+                    { transform: 'translateY(-1.0em)' , fontSize: '3em' },
+                    { transform: 'translateY(-1.5em)' , fontSize: '4em' },
+                    { transform: 'translateY(-2.0em)' , fontSize: '5em' },
+                    { transform: 'translateY(-2.5em)' , fontSize: '6em' },
+                    { transform: 'translateY(-2.0em)' , fontSize: '5em' },
+                    { transform: 'translateY(-1.5em)' , fontSize: '4em' },
+                    { transform: 'translateY(-1.0em)' , fontSize: '3em' },
+                    { transform: 'translateY(-0.5em)' , fontSize: '2em' },
+                    { transform: 'translateY(-0.0em)' , fontSize: '1em' }
+                ], {
+                    // timing options
+                    duration: 2000,
+                });
+                await sleep(4000);
+                document.getElementsByClassName("cover")[0].remove();
+                startGame();
+            }
+
+            async function youLose() {
+                localStorage.setItem("lose", parseInt(localStorage.getItem("lose"))+1);
+                document.getElementById("lose").textContent = localStorage.getItem("lose");
+                document.getElementById("lose").animate([
+                    { transform: 'translateY(-0.0em)' , fontSize: '1em' },
+                    { transform: 'translateY(-0.5em)' , fontSize: '2em' },
+                    { transform: 'translateY(-1.0em)' , fontSize: '3em' },
+                    { transform: 'translateY(-1.5em)' , fontSize: '4em' },
+                    { transform: 'translateY(-2.0em)' , fontSize: '5em' },
+                    { transform: 'translateY(-2.5em)' , fontSize: '6em' },
+                    { transform: 'translateY(-2.0em)' , fontSize: '5em' },
+                    { transform: 'translateY(-1.5em)' , fontSize: '4em' },
+                    { transform: 'translateY(-1.0em)' , fontSize: '3em' },
+                    { transform: 'translateY(-0.5em)' , fontSize: '2em' },
+                    { transform: 'translateY(-0.0em)' , fontSize: '1em' }
+                ], {
+                    // timing options
+                    duration: 2000,
+                });
+                document.getElementById("field").insertAdjacentHTML("afterbegin", "<div id='sorry'><span>Sorry</span></div>");
+                await sleep(4000);
+                startGame();
+            }
+
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            function showArrow(higher) {
+                if (higher) {
+                    field.lastChild.insertAdjacentHTML("beforeend", '<img src="higher.png" class="arrow">');
+                } else {
+                    field.lastChild.insertAdjacentHTML("beforeend", '<img src="lower.png" class="arrow">');
+                }
+            }
+
+            function showWrong() {
+                field.lastChild.insertAdjacentHTML("beforeend", '<img src="wrong.png" class="arrow">');
+                youLose();
+            }
+
+            function makeGuess(card) {
+                const currentCardValue = cardValue(card);
+                var h = 0;
+                var l = 0;
+                for (const c of deck) {
+                    if (cardValue(c) > currentCardValue) {
+                        h++;
+                    } else {
+                        l ++;
+                    }
+                }
+                if (h == l) {
+                    if (Math.round(Math.random()) > 0) {
+                        h++;
+                    } else {
+                        l++;
+                    }
+                }
+                if (h > l) {
+                    higher();
+                } else {
+                    lower();
+                }
+            }
+        </script>
+    </head>
+    <body onLoad="startGame();">
+        
+        <div id="board">
+            <div id="buttons">
+                <button id="higher" onClick="higher();">Higher</button>
+                <button id="lower" onClick="lower();">Lower</button>
+            </div>
+            <div id="field">
+                
+            </div>
+            <div id="score">Wins:&nbsp;&nbsp;<span id="win">0</span>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                Losses:&nbsp;&nbsp;<span id="lose">0</span>
+            </div>
+        </div>
+    </body>
+</html>
