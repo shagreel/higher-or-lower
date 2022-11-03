@@ -1,5 +1,5 @@
 # higher-or-lower
-A simple javascript statistical game created for use in an elementary school STEM night.
+A simple javascript statistical game created for use at an elementary school STEM night. [Try the demo](https://shagreel.github.io/higher-or-lower/highorlow.html).
 
 In this game you start with a shuffled deck of 10 cards, Ace through 10. The first card is dealt face up. You then must determine if the next card will be higher or lower than the last card. This allows students to learn basic statistical probablility.
 
